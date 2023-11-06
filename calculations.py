@@ -62,11 +62,31 @@ def clear_results(result_label, error_label, info_label):
 
 # Define the function for calculating the root
 def calculate_root(root, method_var, expression_entry, tolerance_entry, max_iterations_entry, a_entry, b_entry, result_label, error_label, info_label, check_var, plot_var, clear_var):
-    method = method_var.get()
-    user_entry = expression_entry.get()
-    tolerance = tolerance_entry.get()
-    max_iterations = max_iterations_entry.get()
-
+   
+    try:
+        method = method_var.get()
+        user_entry = expression_entry.get()
+        tolerance = tolerance_entry.get()
+        max_iterations = max_iterations_entry.get()
+        tolerance = float(tolerance)
+        max_iterations = int(max_iterations)
+        if tolerance < 0:
+            raise Exception("Tolerance must be positive.")
+        if max_iterations < 1:
+            raise Exception("Max iterations must be greater than 0.")
+        if max_iterations > 1000:
+            raise Exception("Max iterations must be less than 1000.")
+        if not user_entry:
+            raise Exception("Please enter an equation.")
+        # check if the equation is valid if any other character is entered other than sin, cos, tan, log, ln, e, pi, x, +, -, *, /, ^, (, ), ., space
+        if not re.match(r'^[sincotanloglneπx\+\-\*\/\^\(\)\.\s]+$', user_entry):
+            raise Exception("Please enter a valid equation.")
+    except Exception as e:
+        result_label.config(text="Error: {}".format(e), fg="red")
+        error_label.config(text="")
+        info_label.config(text="")
+        return
+    
     if not user_entry or not tolerance or not max_iterations:
         fields_error(result_label, error_label, info_label)
         return
@@ -74,8 +94,13 @@ def calculate_root(root, method_var, expression_entry, tolerance_entry, max_iter
     equation = user_entry.replace("^", "**")  # Replace "^" with "**"
     # Replace "2x" with "2*x"
     modified_input = re.sub(pattern, replace, equation)
-    def f(x): return sympy.sympify(modified_input).subs('x', x)
-    # def f(x): return eval(modified_input)
+    try:
+        def f(x): return sympy.sympify(modified_input).subs('x', x)
+    except Exception as e:
+        result_label.config(text="Error: {}".format(e), fg="red")
+        error_label.config(text="")
+        info_label.config(text="")
+        return
 
     try:
         a = a_entry.get()
