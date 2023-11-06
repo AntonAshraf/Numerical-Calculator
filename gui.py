@@ -23,8 +23,28 @@ def on_method_change(*args, method_var, a_label, b_label, b_entry):
 
 def create_gui(root):
 
+    def increase_font_size():
+        current_size = tk.font.nametofont("TkDefaultFont").actual()["size"]
+        tk.font.nametofont("TkDefaultFont").configure(size=current_size+2)
+        for widget in root.winfo_children():
+            widget.configure(font=("TkDefaultFont", current_size+2))
+        width = root.winfo_width() + 100
+        height = root.winfo_height() + 60
+        root.geometry(f"{width}x{height}")
+        root.update()
+
+    def decrease_font_size():
+        current_size = tk.font.nametofont("TkDefaultFont").actual()["size"]
+        tk.font.nametofont("TkDefaultFont").configure(size=current_size-2)
+        for widget in root.winfo_children():
+            widget.configure(font=("TkDefaultFont", current_size-2))
+        width = root.winfo_width() - 100
+        height = root.winfo_height() - 60
+        root.geometry(f"{width}x{height}")
+        root.update()
+        
     root.title("Numerical Methods Calculator - Anton Ashraf")
-    root.geometry("700x400")
+    root.geometry("700x450")
 
     # Create a grid layout
     root.grid()
@@ -120,6 +140,14 @@ def create_gui(root):
     clear_var = tk.IntVar(value=1)
     clear_button = Checkbutton(root, text="Clear Results", variable=clear_var)
     clear_button.grid(row=15, column=2)
+
+    # Button for increasing font size
+    font_button = Button(root, text="+ Zoom In", command=increase_font_size)
+    font_button.grid(row=16, column=1)
+
+    # Button for decreasing font size
+    font_button = Button(root, text="- Zoom Out", command=decrease_font_size)
+    font_button.grid(row=16, column=2)
 
     # Configure rows and columns to expand when window is resized
     root.grid_rowconfigure(0, weight=1)
